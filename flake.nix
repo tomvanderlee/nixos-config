@@ -20,11 +20,26 @@
         "x86_64-darwin"
         "aarch64-darwin"
       ];
+
+      # Any directory under hosts/ other than hosts/template that contains a
+      # `system` file becomes a real nixosConfigurations.<name> output —
+      # adding a host means dropping in a directory, not editing this file.
+      # hosts/template is excluded by name so it is never built, even though
+      # it also carries a system file (kept only so it stays a complete,
+      # consistent copy-source for the bootstrap script).
+      hostNames = builtins.attrNames
+        (nixpkgs.lib.filterAttrs
+          (name: type: type == "directory" && name != "template")
+          (builtins.readDir ./hosts));
+
+      mkHostConfig = hostname:
+        lib.mkNixos {
+          inherit hostname;
+          system = builtins.readFile (./hosts + "/${hostname}/system");
+        };
     in
     {
-      # No real NixOS host exists yet. hosts/template/ is copy-source only and
-      # is deliberately not wired in here — see hosts/template/ and README.md.
-      nixosConfigurations = { };
+      nixosConfigurations = nixpkgs.lib.genAttrs hostNames mkHostConfig;
 
       homeConfigurations = {
         "tom@linux" = lib.mkHome {
@@ -42,6 +57,21 @@
         {
           default = pkgs.mkShell {
             packages = [ pkgs.statix pkgs.deadnix pkgs.nixfmt-rfc-style ];
+          };
+        });
+
+      apps = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          bootstrap-host = {
+            type = "app";
+            program = "${pkgs.writeShellApplication {
+              name = "bootstrap-host";
+              runtimeInputs = [ pkgs.coreutils pkgs.gnused ];
+              text = builtins.readFile ./scripts/bootstrap-host.sh;
+            }}/bin/bootstrap-host";
           };
         });
     };
