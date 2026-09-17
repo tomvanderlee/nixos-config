@@ -46,6 +46,11 @@
           username = "tom";
           system = "x86_64-linux";
         };
+
+        "tom@darwin" = lib.mkHome {
+          username = "tom";
+          system = "aarch64-darwin";
+        };
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);

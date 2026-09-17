@@ -7,10 +7,11 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 - `flake.nix` — inputs (`nixpkgs`, `home-manager`) and outputs (`nixosConfigurations`, `homeConfigurations`, `formatter`, `devShells`)
 - `lib/` — `mkNixos` and `mkHome` helper functions that build `nixosConfigurations` / `homeConfigurations` entries
 - `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host
-- `modules/home/` — the shared, cross-platform home-manager profile (shell, git, editor, CLI tools). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
+- `modules/home/` — the shared, cross-platform home-manager profile (shell, editor, CLI tools, dotfiles). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
 - `users/tom.nix` — identity/profile file consumed by both `mkNixos` and `mkHome`
 - `hosts/template/` — a copy-source-only NixOS host skeleton; **never** wired into `flake.nix` outputs directly (excluded from discovery by name — see below). Copy it via `scripts/bootstrap-host.sh` (or `nix run .#bootstrap-host`) when provisioning a real machine
 - `scripts/bootstrap-host.sh` — scaffolds a new `hosts/<hostname>/` from the template; exposed as `apps.<system>.bootstrap-host`
+- `modules/home/dotfiles.nix` — opt-in personal dotfiles automation (see below)
 
 Any directory under `hosts/` other than `hosts/template` that contains a `system` file automatically becomes a real `nixosConfigurations.<name>` output — adding a host means dropping in a directory, not editing `flake.nix`.
 
@@ -34,13 +35,25 @@ This flake does not partition disks for you — do that first, with the standard
 
 ## Installing on a non-NixOS system (any Linux, or macOS once supported)
 
-Non-NixOS hosts are unaffected by `bootstrap-host` — there's nothing per-host to scaffold, since `homeConfigurations."tom@linux"` is one generic entry shared by every standalone machine.
+Non-NixOS hosts are unaffected by `bootstrap-host` — there's nothing per-host to scaffold. `homeConfigurations` has one generic entry per platform (`tom@linux` for x86_64-linux, `tom@darwin` for aarch64-darwin), shared by every standalone machine of that platform.
 
 1. Install Nix. Recommended: the [Determinate Systems installer](https://github.com/DeterminateSystems/nix-installer) (flakes enabled by default). The official installer also works, but you'll need to add `experimental-features = nix-command flakes` to `nix.conf` yourself.
 2. `git clone <your-remote-url> ~/nix-config`.
-3. First run: `nix run home-manager/master -- switch --flake ~/nix-config#tom@linux`. After that, `home-manager switch --flake ~/nix-config#tom@linux` works directly.
+3. First run: `nix run home-manager/master -- switch --flake ~/nix-config#tom@linux` (or `#tom@darwin` on macOS). After that, `home-manager switch --flake ~/nix-config#tom@linux` (or `#tom@darwin`) works directly.
 
 This only touches your home directory — no sudo required.
+
+## Personal dotfiles (opt-in)
+
+`modules/home/dotfiles.nix` can automatically clone a separate personal dotfiles repo to `~/dotfiles` and symlink its top-level package directories into `$HOME`, GNU-Stow style (each package directory's contents mirror their target path — e.g. a package's `.gitconfig` links to `~/.gitconfig`). It's opt-in and controlled by a single option:
+
+```nix
+home.dotfiles.repoUrl = "https://example.com/your/dotfiles.git";
+```
+
+`users/tom.nix` sets this to `https://git.tomvanderlee.com/dotfiles` — the feature is active as soon as this flake is activated with `home-manager switch`.
+
+Behavior notes: an existing `~/dotfiles` checkout is never re-cloned or modified; every non-hidden top-level directory is treated as a stow package; one package's conflict with an existing file only skips that package (a warning is printed) rather than blocking the rest. Because `~/dotfiles/git/.gitconfig` is expected to be the sole source of git configuration once stowed, this repo's own `programs.git` home-manager management has been removed — `git` itself is still installed via `modules/home/cli-tools.nix` regardless of whether `repoUrl` is set.
 
 ## Development
 
