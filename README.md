@@ -6,8 +6,8 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 
 - `flake.nix` — inputs (`nixpkgs`, `home-manager`) and outputs (`nixosConfigurations`, `homeConfigurations`, `formatter`, `devShells`)
 - `lib/` — `mkNixos` and `mkHome` helper functions that build `nixosConfigurations` / `homeConfigurations` entries
-- `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host
-- `modules/home/` — the shared, cross-platform home-manager profile (shell, editor, CLI tools, dotfiles). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
+- `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22
+- `modules/home/` — the shared, cross-platform home-manager profile (shell, editor, CLI tools, dev tools, dotfiles). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
 - `users/tom.nix` — identity/profile file consumed by both `mkNixos` and `mkHome`
 - `hosts/template/` — a copy-source-only NixOS host skeleton; **never** wired into `flake.nix` outputs directly (excluded from discovery by name — see below). Copy it via `scripts/bootstrap-host.sh` (or `nix run .#bootstrap-host`) when provisioning a real machine
 - `scripts/bootstrap-host.sh` — scaffolds a new `hosts/<hostname>/` from the template; exposed as `apps.<system>.bootstrap-host`
@@ -53,7 +53,15 @@ home.dotfiles.repoUrl = "https://example.com/your/dotfiles.git";
 
 `users/tom.nix` sets this to `https://git.tomvanderlee.com/dotfiles` — the feature is active as soon as this flake is activated with `home-manager switch`.
 
-Behavior notes: an existing `~/dotfiles` checkout is never re-cloned or modified; every non-hidden top-level directory is treated as a stow package; one package's conflict with an existing file only skips that package (a warning is printed) rather than blocking the rest. Because `~/dotfiles/git/.gitconfig` is expected to be the sole source of git configuration once stowed, this repo's own `programs.git` home-manager management has been removed — `git` itself is still installed via `modules/home/cli-tools.nix` regardless of whether `repoUrl` is set.
+Behavior notes: an existing `~/dotfiles` checkout is never re-cloned or modified; every non-hidden top-level directory is treated as a stow package; one package's conflict with an existing file only skips that package (a warning is printed) rather than blocking the rest. Because `~/dotfiles/git/.gitconfig` and `~/dotfiles/bash/.bashrc` are expected to be the sole sources of git and bash configuration once stowed, this repo's own `programs.git`/`programs.bash` home-manager management has been removed — `git` itself is still installed via `modules/home/cli-tools.nix`, and `bash` ships with both macOS and NixOS regardless of whether `repoUrl` is set.
+
+## Developer tooling
+
+`modules/home/dev-tools.nix` provisions the developer's most-used CLI tools: `gh`, `tmux`, `htop`, `yq-go`, `tree-sitter`, `docker`, `docker-compose`, `kubectl`, `awscli2`. The container/cloud entries (`docker`, `docker-compose`, `kubectl`, `awscli2`) are client/CLI tools only — the actual container runtime (OrbStack/Docker Desktop on macOS) and any cloud account configuration stay outside Nix's control; these just give you a consistent CLI version to talk to whatever runtime/account is already set up.
+
+`terraform` was considered but deliberately left out: recent versions are unfree-licensed (HashiCorp's BSL), which would require either `nixpkgs.config.allowUnfree = true` (flake-wide, not just for terraform) or substituting `opentofu`. Neither was wanted for now.
+
+**Shell and prompt**: bash is the primary managed shell (matching where the real shell config already lives — `~/dotfiles/bash/.bashrc`). `modules/home/shell.nix` only provisions the `liquidprompt` package; its configuration and activation are entirely owned by `~/dotfiles/liquidprompt/`, same as git and bash. There is no Nix-managed `starship` or `direnv` — both were removed; per-project environments are left entirely to your existing pyenv/nvm/rustup setup rather than a Nix-managed alternative.
 
 ## Development
 

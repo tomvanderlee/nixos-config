@@ -13,11 +13,22 @@
   time.timeZone = lib.mkDefault "Etc/UTC";
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
 
-  programs.zsh.enable = true;
-
   users.users.tom = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
-    shell = pkgs.zsh;
+    shell = pkgs.bash;
+  };
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 ];
   };
 }
