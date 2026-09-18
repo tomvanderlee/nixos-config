@@ -42,7 +42,7 @@
 
 ## 9. Validation
 
-- [ ] 9.1 Run `nix flake check` and confirm it passes without `--impure`, covering `lib`, `homeConfigurations."tom@linux"`, `formatter`, and `devShells` (**blocked — nix not installed locally; no fallback verification possible. Run this once Nix is available.**)
+- [x] 9.1 Run `nix flake check` and confirm it passes without `--impure`, covering `lib`, `homeConfigurations."tom@linux"`, `formatter`, and `devShells` (**blocked — nix not installed locally; no fallback verification possible. Run this once Nix is available.**) (run by the user on a Linux machine with Nix, 2026-09-18: `nix flake check` passed with no errors — only benign warnings, `nixfmt-rfc-style`/missing `apps.*.meta` since fixed in a later change, and the expected "omitted incompatible systems" notice since the run was on a single system without `--all-systems`)
 - [x] 9.2 Manually review `flake.nix` and confirm `nixosConfigurations` is empty (or absent) in this change, per the design decision not to expose the unbuilt template (confirmed: `nixosConfigurations = { };`)
 
 ## 10. Documentation

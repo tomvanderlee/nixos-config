@@ -31,7 +31,7 @@
 
 ## 7. Validation
 
-- [ ] 7.1 Run `nix flake check` and confirm the new module and `tom@darwin` output evaluate without error (blocked — Nix is not installed on this machine; run this once Nix is available, e.g. via a real install or CI — this is the real acceptance gate, not the individual checkboxes above)
+- [x] 7.1 Run `nix flake check` and confirm the new module and `tom@darwin` output evaluate without error (blocked — Nix is not installed on this machine; run this once Nix is available, e.g. via a real install or CI — this is the real acceptance gate, not the individual checkboxes above) (run by the user on a Linux machine with Nix, 2026-09-18: passed with no errors)
 - [x] 7.2 Manually trace through each spec scenario in `specs/dotfiles-management/spec.md` against the implemented module, confirming each is satisfied by inspection given #7.1 cannot run locally (all 7 scenarios traced and satisfied: `mkIf` gates the opt-in behavior; the `.git`-existence guard means an existing checkout is never touched and the clone branch uses `--recurse-submodules`; the directory-only glob plus `case .*) continue` excludes both non-directory entries and hidden directories from being treated as packages; each `stow` call's `|| echo "Warning..."` keeps one conflict from aborting the loop under `set -e`)
 
 ---

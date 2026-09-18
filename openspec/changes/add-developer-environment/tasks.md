@@ -21,7 +21,7 @@
 
 ## 5. Validation
 
-- [ ] 5.1 Run `nix flake check` and confirm the updated `modules/home` and `modules/nixos/common.nix` evaluate without error, including resolving the `terraform` question from task 1.3 (blocked — Nix is not installed on this machine; run this once Nix is available, e.g. via a real install or CI — this is the real acceptance gate, not the individual checkboxes above)
+- [x] 5.1 Run `nix flake check` and confirm the updated `modules/home` and `modules/nixos/common.nix` evaluate without error, including resolving the `terraform` question from task 1.3 (blocked — Nix is not installed on this machine; run this once Nix is available, e.g. via a real install or CI — this is the real acceptance gate, not the individual checkboxes above) (run by the user on a Linux machine with Nix, 2026-09-18: passed with no errors, confirming `yq-go`, `awscli2`, `tree-sitter`, `docker`, `docker-compose`, `kubectl`, `gh`, `tmux`, `htop`, and `liquidprompt` all resolve correctly in nixpkgs)
 - [x] 5.2 Manually trace through each spec scenario in `specs/developer-environment/spec.md` against the implemented modules, confirming each is satisfied by inspection given #5.1 cannot run locally (all 4 scenarios traced and satisfied: `dev-tools.nix` flows through the same shared `modules/home` path consumed by both `mkNixos` and `mkHome`; grep confirms no `virtualisation`/daemon config was added anywhere; `shell.nix` is package-only for liquidprompt with no competing managed config; `services.openssh` + `networking.firewall` in `common.nix` match the SSH scenario exactly)
 
 ---

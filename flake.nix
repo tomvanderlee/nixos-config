@@ -53,7 +53,7 @@
         };
       };
 
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       devShells = forAllSystems (system:
         let
@@ -61,7 +61,7 @@
         in
         {
           default = pkgs.mkShell {
-            packages = [ pkgs.statix pkgs.deadnix pkgs.nixfmt-rfc-style ];
+            packages = [ pkgs.statix pkgs.deadnix pkgs.nixfmt ];
           };
         });
 
@@ -76,6 +76,7 @@
               name = "bootstrap-host";
               runtimeInputs = [ pkgs.coreutils pkgs.gnused ];
               text = builtins.readFile ./scripts/bootstrap-host.sh;
+              meta.description = "Scaffold a new NixOS host from hosts/template";
             }}/bin/bootstrap-host";
           };
         });
