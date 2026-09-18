@@ -17,6 +17,14 @@
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     shell = pkgs.bash;
+    # Fetched once from https://github.com/tomvanderlee.keys and pinned here
+    # as a static literal (not fetched at build time, which would require
+    # --impure) — update this list by hand if keys are added/rotated on
+    # GitHub.
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDZQd4C53B3v7Si6NjNH8uXTrLOx5NXIWhF6R9Mk7hpDWQWwvXzCL6I/aY7cai2s8QgM5ptdVlx5pkogedPJCFEzLQoal/X6hOfNj1xAhDxEyEf7h+tflsnWqMFy92H7cC5o/xM48JRX1Fpm62xN7MrkUsZvV/t+HV6rISCNxOVXI7m0PowQT9zDGrAI2Q0dSLiqxvq/lMsU6aSJJz1kkQhcxLHJbm72mhZxf7NrF4I1OoEyuLTLpsgx8VpZwDlkp1m6+wy8xS/jNzr3ukjlTFy2RtDFyhiYTtwZI8j0ESNF3bp+FApUtHQ6dtcHGf5qHO9DaMYL94hPXuyebih723vQLVXqXDyXn7rHXD/laCPoE/2NeMA9h+g+MH6xqxbASVzWJuRq3RE+7VdIR+Y6Du1QkxLlNoPlDJTGb+n1OSMvVKum+XzNdneEP4txeXjvg/sfB/d53BCLaWB9tQEelNJaSue6JxckYNug4NE68b5dx4gvPw5qiKM8fzDZJSyvS0="
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBz9LunRyAORLkF2S+MBwCmFdqp7sjJkKhTyog23cNVD2Ad9ElQZR9IgOGA0DjgOW3RgbDXoeGQi6v6V+Fy3dD+wieW2FMAmlsDOhUj9NdqC3ySbGZCGhnlKae8uZD4ywAA9Ipl+uz/s9A89rVDKzza7H7M7A0aaNKG306baPhiepAU+vLhlPgEZr0RJpbXt2HrBHWHKwTURJ4Gn2VmOIO6/tgsrlIdn3iZ4nO3GIZ06IM8U+MQhLWdfrzKI2E5gBMqRDVOih8upmkvbtwAcUl51tsMqEu0l3Xmn5D/OhTCFZXENiAqcfZNng7UDwI6iWQ201R9Dn4cJOK3e49lZhR"
+    ];
   };
 
   services.openssh = {
