@@ -12,7 +12,7 @@
 ## 3. NixOS common module: shell, sshd, firewall
 
 - [x] 3.1 In `modules/nixos/common.nix`, change `users.users.tom.shell` from `pkgs.zsh` to `pkgs.bash`, and remove the `programs.zsh.enable = true;` line — verify by reading the file
-- [x] 3.2 Add `services.openssh = { enable = true; settings = { PasswordAuthentication = false; PermitRootLogin = "no"; }; };` — verify by reading the added block
+- [x] 3.2 Add `services.openssh = { enable = true; settings = { PasswordAuthentication = false; PermitRootLogin = "no"; }; };` — verify by reading the added block (**correction, 2026-09-18: this locked the user out of the first real host, `floep`. Key-only auth was enabled with no `authorizedKeys` ever provisioned for `tom` — the "you already have SSH keys" justification in design.md referred to keys existing on client machines, not that this host trusted any of them. Fixed in a later commit by adding `users.users.tom.openssh.authorizedKeys.keys` to `modules/nixos/common.nix`, sourced from `https://github.com/tomvanderlee.keys`. Recovery required local UTM console access since SSH itself was the thing that was broken.**)
 - [x] 3.3 Add `networking.firewall = { enable = true; allowedTCPPorts = [ 22 ]; };` — verify by reading the added block
 
 ## 4. Documentation
