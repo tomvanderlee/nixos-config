@@ -6,7 +6,7 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 
 - `flake.nix` — inputs (`nixpkgs`, `home-manager`) and outputs (`nixosConfigurations`, `homeConfigurations`, `formatter`, `devShells`)
 - `lib/` — `mkNixos` and `mkHome` helper functions that build `nixosConfigurations` / `homeConfigurations` entries
-- `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22
+- `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22, and a GNOME desktop (GDM login, NetworkManager, PipeWire audio, CUPS+Avahi printing) — see below
 - `modules/home/` — the shared, cross-platform home-manager profile (shell, editor, CLI tools, dev tools, dotfiles). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
 - `users/tom.nix` — identity/profile file consumed by both `mkNixos` and `mkHome`
 - `hosts/template/` — a copy-source-only NixOS host skeleton; **never** wired into `flake.nix` outputs directly (excluded from discovery by name — see below). Copy it via `scripts/bootstrap-host.sh` (or `nix run .#bootstrap-host`) when provisioning a real machine
@@ -32,6 +32,10 @@ This flake does not partition disks for you — do that first, with the standard
 7. `nixos-install --root /mnt --flake ~/nix-config#<real-hostname>`.
 8. Reboot and remove the install media.
 9. Afterwards, clone the flake to a stable path (e.g. `/etc/nix-config`) so future updates are just `sudo nixos-rebuild switch --flake /etc/nix-config#<real-hostname>`.
+
+## Desktop environment
+
+Every NixOS host built from this flake boots into a GNOME desktop by default (GDM as the login manager), applied unconditionally in `modules/nixos/common.nix` rather than as a per-host opt-in. Necessary companions are enabled alongside it: `networking.networkmanager` (GNOME's own network settings UI), `services.pipewire` + `security.rtkit` (audio, including PulseAudio-compatible clients), and `services.printing` (CUPS) + `services.avahi` (`nssmdns4`, `openFirewall`) for printing and network/AirPrint printer discovery — `openFirewall` is required so mDNS discovery traffic isn't blocked by the port-22-only firewall this repo already enables. This is a system-level toggle only; per-user GNOME customization (dconf, Shell extensions) is out of scope.
 
 ## Installing on a non-NixOS system (any Linux, or macOS once supported)
 
