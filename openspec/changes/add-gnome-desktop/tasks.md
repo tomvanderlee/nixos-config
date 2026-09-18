@@ -19,5 +19,5 @@
 
 ## 5. Validation
 
-- [ ] 5.1 Run `nix flake check` and confirm `modules/nixos/common.nix` still evaluates without error with the new services added, resolving the option-path question from task 1.2 (blocked — Nix is not installed on this machine, and there's still no live NixOS host to boot; run this once Nix/a real host are available — this is the real acceptance gate, not the individual checkboxes above)
+- [x] 5.1 Run `nix flake check` and confirm `modules/nixos/common.nix` still evaluates without error with the new services added, resolving the option-path question from task 1.2 (ran on a machine with Nix installed — passed, confirming the post-migration `services.displayManager.*`/`services.desktopManager.*` option paths are correct)
 - [x] 5.2 Manually trace through each spec scenario in `specs/gnome-desktop/spec.md` against the implemented module, confirming each is satisfied by inspection given #5.1 cannot run locally
