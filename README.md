@@ -13,6 +13,7 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 - `scripts/bootstrap-host.sh` — scaffolds a new `hosts/<hostname>/` from the template; exposed as `apps.<system>.bootstrap-host`
 - `modules/home/dotfiles.nix` — opt-in personal dotfiles automation (see below)
 - `modules/home/bash-profile.nix` — always-on `~/.bash_profile` bootstrap (see below)
+- `modules/home/editor.nix` — Neovim provisioning; deliberately never writes to `~/.config/nvim` (see below)
 
 Any directory under `hosts/` other than `hosts/template` that contains a `system` file automatically becomes a real `nixosConfigurations.<name>` output — adding a host means dropping in a directory, not editing `flake.nix`.
 
@@ -59,6 +60,10 @@ home.dotfiles.repoUrl = "https://example.com/your/dotfiles.git";
 `users/tom.nix` sets this to `https://git.tomvanderlee.com/dotfiles` — the feature is active as soon as this flake is activated with `home-manager switch`.
 
 Behavior notes: an existing `~/dotfiles` checkout is never re-cloned or modified; every non-hidden top-level directory is treated as a stow package; one package's conflict with an existing file only skips that package (a warning is printed) rather than blocking the rest. Because `~/dotfiles/git/.gitconfig` and `~/dotfiles/bash/.bashrc` are expected to be the sole sources of git and bash configuration once stowed, this repo's own `programs.git`/`programs.bash` home-manager management has been removed — `git` itself is still installed via `modules/home/cli-tools.nix`, and `bash` ships with both macOS and NixOS regardless of whether `repoUrl` is set.
+
+## Editor (Neovim)
+
+`modules/home/editor.nix` installs Neovim as the default editor (`$EDITOR`/`$VISUAL`, plus a `vim` alias), and provisions a C compiler (`pkgs.stdenv.cc`) and the `tree-sitter` CLI so natively-built plugins can compile. It deliberately sets `programs.neovim.sideloadInitLua = true`, which stops home-manager from writing anything to `~/.config/nvim/init.lua` — that path is owned exclusively by the personal dotfiles repo's `neovim` Stow package (lazy.nvim + plugins). Without `sideloadInitLua`, home-manager's own generated `init.lua` permanently conflicts with that Stow package and it gets silently skipped (per the dotfiles automation's skip-on-conflict behavior above), so plugins never load. **Don't add `programs.neovim.extraConfig`/`plugins`/anything else that writes into `~/.config/nvim` here** — it would reintroduce the same conflict.
 
 ## Login shell bootstrap
 

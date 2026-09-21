@@ -5,7 +5,6 @@
     tmux
     htop
     yq-go
-    tree-sitter
     docker
     docker-compose
     kubectl
