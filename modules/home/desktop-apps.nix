@@ -1,6 +1,6 @@
 { pkgs, lib, ... }:
 let
-  crossPlatformApps = [ pkgs.slack pkgs.discord pkgs.spotify ];
+  crossPlatformApps = [ pkgs.slack pkgs.discord pkgs.spotify pkgs.firefox pkgs.bitwarden-desktop ];
   linuxOnlyApps = lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.teams-for-linux;
   candidateApps = crossPlatformApps ++ linuxOnlyApps;
 in

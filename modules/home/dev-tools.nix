@@ -9,5 +9,6 @@
     docker-compose
     kubectl
     awscli2
+    bitwarden-cli
   ]) ++ lib.optional (lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.claude-code) pkgs.claude-code;
 }
