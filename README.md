@@ -12,6 +12,7 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 - `hosts/template/` — a copy-source-only NixOS host skeleton; **never** wired into `flake.nix` outputs directly (excluded from discovery by name — see below). Copy it via `scripts/bootstrap-host.sh` (or `nix run .#bootstrap-host`) when provisioning a real machine
 - `scripts/bootstrap-host.sh` — scaffolds a new `hosts/<hostname>/` from the template; exposed as `apps.<system>.bootstrap-host`
 - `modules/home/dotfiles.nix` — opt-in personal dotfiles automation (see below)
+- `modules/home/bash-profile.nix` — always-on `~/.bash_profile` bootstrap (see below)
 
 Any directory under `hosts/` other than `hosts/template` that contains a `system` file automatically becomes a real `nixosConfigurations.<name>` output — adding a host means dropping in a directory, not editing `flake.nix`.
 
@@ -58,6 +59,10 @@ home.dotfiles.repoUrl = "https://example.com/your/dotfiles.git";
 `users/tom.nix` sets this to `https://git.tomvanderlee.com/dotfiles` — the feature is active as soon as this flake is activated with `home-manager switch`.
 
 Behavior notes: an existing `~/dotfiles` checkout is never re-cloned or modified; every non-hidden top-level directory is treated as a stow package; one package's conflict with an existing file only skips that package (a warning is printed) rather than blocking the rest. Because `~/dotfiles/git/.gitconfig` and `~/dotfiles/bash/.bashrc` are expected to be the sole sources of git and bash configuration once stowed, this repo's own `programs.git`/`programs.bash` home-manager management has been removed — `git` itself is still installed via `modules/home/cli-tools.nix`, and `bash` ships with both macOS and NixOS regardless of whether `repoUrl` is set.
+
+## Login shell bootstrap
+
+NixOS and most other Linux distros don't ship a `~/.bash_profile` that sources `~/.bashrc`, so login shells never pick up your bash config. `modules/home/bash-profile.nix` creates one for you — but only if `~/.bash_profile` doesn't already exist. If it's already there (any file or symlink), it's left completely untouched; home-manager never edits or removes it. This is always on, on every platform (Linux and macOS), and isn't gated by `home.dotfiles.repoUrl` — it works whether or not you use the personal dotfiles automation above.
 
 ## Developer tooling
 
