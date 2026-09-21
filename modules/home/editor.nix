@@ -17,8 +17,13 @@
 
   # tree-sitter (parser compilation) and a C compiler for natively-built
   # Neovim plugins declared by the dotfiles-owned config above.
+  # nodejs/python3/unzip: required on PATH by mason.nvim's installers
+  # (npm-based LSP servers, debugpy, terraform-ls).
   home.packages = with pkgs; [
     tree-sitter
     stdenv.cc
+    nodejs
+    python3
+    unzip
   ];
 }
