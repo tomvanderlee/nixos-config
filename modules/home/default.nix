@@ -6,5 +6,6 @@
     ./cli-tools.nix
     ./dotfiles.nix
     ./dev-tools.nix
+    ./desktop-apps.nix
   ];
 }
