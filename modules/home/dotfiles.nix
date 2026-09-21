@@ -7,8 +7,8 @@ let
   # platform. Kept minimal and overridable via excludePackages rather than
   # a full per-platform mapping - see design.md for alternatives considered.
   platformDefaultExcludes =
-    lib.optionals (!pkgs.stdenv.isDarwin) [ "iterm2" ]
-    ++ lib.optionals (!pkgs.stdenv.isLinux) [ "herbstluftwm" "xorg" ];
+    lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ "iterm2" ]
+    ++ lib.optionals (!pkgs.stdenv.hostPlatform.isLinux) [ "herbstluftwm" "xorg" ];
 
   excludePackages = platformDefaultExcludes ++ cfg.excludePackages;
 in

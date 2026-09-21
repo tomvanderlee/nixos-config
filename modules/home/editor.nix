@@ -9,6 +9,10 @@
     # in separately. Without this, home-manager's own generated init.lua
     # permanently conflicts with that stow package and it gets skipped.
     sideloadInitLua = true;
+    # Pin the legacy (stateVersion < 26.05) provider defaults explicitly so
+    # this doesn't silently change if stateVersion is ever bumped.
+    withRuby = true;
+    withPython3 = true;
   };
 
   # tree-sitter (parser compilation) and a C compiler for natively-built
