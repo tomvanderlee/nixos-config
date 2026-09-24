@@ -19,8 +19,10 @@ let
   # standalone, non-NixOS activations of this shared profile. osConfig is the
   # full NixOS config and is only present when home-manager is integrated
   # into a NixOS system; it's absent for standalone `home-manager switch`.
-  gnomeOnlyApps = lib.optional (osConfig.services.desktopManager.gnome.enable or false
-  ) pkgs.gnome-tweaks;
+  gnomeOnlyApps = lib.optionals (osConfig.services.desktopManager.gnome.enable or false) [
+    pkgs.gnome-tweaks
+    pkgs.gnome-extension-manager
+  ];
   candidateApps = crossPlatformApps ++ linuxOnlyApps ++ gnomeOnlyApps;
 in
 {
