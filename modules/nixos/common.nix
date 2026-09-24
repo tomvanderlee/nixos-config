@@ -68,4 +68,10 @@
     nssmdns4 = true;
     openFirewall = true;
   };
+
+  # Rootless: runs as the user's own systemd user service, not as root, and
+  # has no docker-group privilege-escalation path. setSocketVariable exports
+  # DOCKER_HOST automatically so the docker CLI (dev-tools.nix) just works.
+  virtualisation.docker.rootless.enable = true;
+  virtualisation.docker.rootless.setSocketVariable = true;
 }
