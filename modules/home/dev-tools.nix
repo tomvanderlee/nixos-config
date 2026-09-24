@@ -9,6 +9,7 @@
       docker
       docker-compose
       kubectl
+      kubernetes-helm
       awscli2
       bitwarden-cli
       uv
