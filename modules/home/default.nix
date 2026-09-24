@@ -7,5 +7,6 @@
     ./dotfiles.nix
     ./dev-tools.nix
     ./desktop-apps.nix
+    ./fonts.nix
   ];
 }
