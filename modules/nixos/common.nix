@@ -18,7 +18,10 @@
 
   users.users.tom = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    extraGroups = [
+      "wheel"
+      "docker"
+    ];
     shell = pkgs.bash;
     # Fetched once from https://github.com/tomvanderlee.keys and pinned here
     # as a static literal (not fetched at build time, which would require
@@ -69,9 +72,10 @@
     openFirewall = true;
   };
 
-  # Rootless: runs as the user's own systemd user service, not as root, and
-  # has no docker-group privilege-escalation path. setSocketVariable exports
-  # DOCKER_HOST automatically so the docker CLI (dev-tools.nix) just works.
-  virtualisation.docker.rootless.enable = true;
-  virtualisation.docker.rootless.setSocketVariable = true;
+  # Rootful: standard system service, starts at boot independent of any
+  # login session (rootless was tried first but its per-user systemd unit
+  # didn't reliably start in already-logged-in sessions after a switch).
+  # tom's docker group membership is root-equivalent access, accepted here
+  # for reliability over the rootless isolation guarantee.
+  virtualisation.docker.enable = true;
 }
