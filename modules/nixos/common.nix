@@ -87,4 +87,19 @@
   # tom's docker group membership is root-equivalent access, accepted here
   # for reliability over the rootless isolation guarantee.
   virtualisation.docker.enable = true;
+
+  # Lets prebuilt, foreign dynamically-linked binaries run on NixOS - needed
+  # for uv-managed prebuilt Python interpreters and native wheel extensions,
+  # which expect a standard (non-NixOS) dynamic loader path. The libraries
+  # below extend nix-ld's own baseline (zlib, openssl, bzip2, etc.) with
+  # common CPython build dependencies it doesn't already include.
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    ncurses
+    libffi
+    sqlite
+    readline
+    gdbm
+    expat
+  ];
 }
