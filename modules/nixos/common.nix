@@ -1,6 +1,9 @@
 { pkgs, lib, ... }:
 {
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   nix.gc = {
     automatic = true;
@@ -42,6 +45,14 @@
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+
+  # Defaults GNOME to dark mode without locking it - GNOME Settings'
+  # Appearance toggle still writes to the user's own dconf database, which
+  # is searched before this default database.
+  programs.dconf.enable = true;
+  programs.dconf.profiles.user.databases = [
+    { settings."org/gnome/desktop/interface".color-scheme = "prefer-dark"; }
+  ];
 
   networking.networkmanager.enable = true;
 
