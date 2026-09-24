@@ -12,9 +12,18 @@
   };
 
   # Per-host configuration.nix can override either of these without
-  # conflicting, since they're set with mkDefault here.
+  # conflicting, since they're set with mkDefault here. automatic-timezoned
+  # (below) overrides time.timeZone to null at normal priority once enabled;
+  # Etc/UTC only remains as the boot-time value until it detects and applies
+  # the real one.
   time.timeZone = lib.mkDefault "Etc/UTC";
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
+
+  # Keeps the system timezone in sync with actual location with no manual
+  # timedatectl step and no interactive auth prompt (unlike GNOME's own
+  # "Automatic Time Zone" toggle, which nixpkgs' GNOME module doesn't wire up
+  # to a passwordless polkit rule the way it does for KDE Plasma).
+  services.automatic-timezoned.enable = true;
 
   users.users.tom = {
     isNormalUser = true;
