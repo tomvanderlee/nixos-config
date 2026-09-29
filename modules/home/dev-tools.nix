@@ -1,5 +1,7 @@
 { pkgs, lib, ... }:
 {
+  programs.nh.enable = true;
+
   home.packages =
     (with pkgs; [
       gh
