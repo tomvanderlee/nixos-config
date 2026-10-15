@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.home.dotfiles;
   dotfilesDir = "${config.home.homeDirectory}/dotfiles";
@@ -8,15 +13,36 @@ let
   # a full per-platform mapping - see design.md for alternatives considered.
   platformDefaultExcludes =
     lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ "iterm2" ]
-    ++ lib.optionals (!pkgs.stdenv.hostPlatform.isLinux) [ "herbstluftwm" "xorg" ];
+    ++ lib.optionals (!pkgs.stdenv.hostPlatform.isLinux) [
+      "herbstluftwm"
+      "xorg"
+    ];
 
   excludePackages = platformDefaultExcludes ++ cfg.excludePackages;
+
+  # After a fresh clone, keep the clone source as `github` and make `origin`
+  # (the push target) the branch upstream. Only config is written, no fetch,
+  # since origin may be unreachable at this point.
+  postCloneRemotes = lib.optionalString (cfg.originUrl != "") ''
+    if [ -d "$DOTFILES_DIR/.git" ]; then
+      branch="$(${pkgs.git}/bin/git -C "$DOTFILES_DIR" symbolic-ref --short HEAD)"
+      $DRY_RUN_CMD ${pkgs.git}/bin/git -C "$DOTFILES_DIR" remote add origin ${lib.escapeShellArg cfg.originUrl}
+      $DRY_RUN_CMD ${pkgs.git}/bin/git -C "$DOTFILES_DIR" config "branch.$branch.remote" origin
+      $DRY_RUN_CMD ${pkgs.git}/bin/git -C "$DOTFILES_DIR" config "branch.$branch.merge" "refs/heads/$branch"
+    fi
+  '';
 in
 {
   options.home.dotfiles.repoUrl = lib.mkOption {
     type = lib.types.str;
     default = "";
     description = "Git URL of the personal dotfiles repo to clone and stow into $HOME. Leave empty to disable.";
+  };
+
+  options.home.dotfiles.originUrl = lib.mkOption {
+    type = lib.types.str;
+    default = "";
+    description = "Optional push-target URL. When set, the initial clone names repoUrl's remote `github` and adds this URL as `origin`, which the checked-out branch then tracks. Existing checkouts are left untouched.";
   };
 
   options.home.dotfiles.excludePackages = lib.mkOption {
@@ -26,14 +52,20 @@ in
   };
 
   config = lib.mkIf (cfg.repoUrl != "") {
-    home.packages = [ pkgs.git pkgs.stow ];
+    home.packages = [
+      pkgs.git
+      pkgs.stow
+    ];
 
     home.activation.dotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       DOTFILES_DIR=${lib.escapeShellArg dotfilesDir}
       EXCLUDE_PACKAGES=(${lib.escapeShellArgs excludePackages})
       if [ ! -d "$DOTFILES_DIR/.git" ]; then
         $DRY_RUN_CMD ${pkgs.git}/bin/git clone --recurse-submodules \
-          ${lib.escapeShellArg cfg.repoUrl} "$DOTFILES_DIR"
+          ${
+            lib.optionalString (cfg.originUrl != "") "--origin github "
+          }${lib.escapeShellArg cfg.repoUrl} "$DOTFILES_DIR"
+        ${postCloneRemotes}
       fi
       if [ -d "$DOTFILES_DIR" ]; then
         for pkg in "$DOTFILES_DIR"/*/; do
