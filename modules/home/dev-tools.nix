@@ -15,6 +15,7 @@
       awscli2
       bitwarden-cli
       uv
+      openssl
     ])
     ++ lib.optional (lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.claude-code) pkgs.claude-code;
 }

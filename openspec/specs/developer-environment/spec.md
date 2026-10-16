@@ -39,3 +39,10 @@ Every NixOS host built from this flake's shared system module SHALL have an SSH 
 #### Scenario: An authorized key is provisioned
 - **WHEN** a NixOS host is built from the shared system module
 - **THEN** the user account has at least one authorized public key configured, so a matching private key can actually authenticate over SSH
+
+### Requirement: The openssl command is provisioned
+The shared home-manager profile SHALL provide the `openssl` command-line tool on `PATH`, identically on every platform where the profile is activated.
+
+#### Scenario: openssl is available after activation
+- **WHEN** the shared home profile is activated on a supported platform
+- **THEN** `openssl version` runs successfully without any additional installation step
