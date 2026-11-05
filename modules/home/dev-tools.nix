@@ -6,6 +6,10 @@
   # (installed for mason.nvim) has a store RUNPATH and ignores nix-ld, so
   # prebuilt native wheels (e.g. greenlet needing libstdc++) can't load there.
   home.sessionVariables.UV_PYTHON_PREFERENCE = "only-managed";
+  # Default to the 3.14 series: the newest managed release (3.15) lacks wheels
+  # for some dependencies (e.g. cffi), and development projects should not
+  # fall over to source builds. A .python-version or --python still wins.
+  home.sessionVariables.UV_PYTHON = "3.14";
 
   home.packages =
     (with pkgs; [
