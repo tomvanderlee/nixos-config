@@ -91,7 +91,7 @@
   # Lets prebuilt, foreign dynamically-linked binaries run on NixOS - needed
   # for uv-managed prebuilt Python interpreters and native wheel extensions,
   # which expect a standard (non-NixOS) dynamic loader path. The libraries
-  # below extend nix-ld's own baseline (zlib, openssl, bzip2, etc.) with
+  # below extend nix-ld's own baseline (openssl, bzip2, etc.) with
   # common CPython build dependencies it doesn't already include.
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
@@ -101,5 +101,10 @@
     readline
     gdbm
     expat
+    # Listed explicitly rather than relying on nix-ld's defaults.
+    stdenv.cc.cc.lib # libstdc++.so.6
+    zlib
+    libuuid
+    libxcrypt-legacy # libcrypt.so.1
   ];
 }
