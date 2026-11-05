@@ -7,6 +7,7 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 - `flake.nix` — inputs (`nixpkgs`, `home-manager`) and outputs (`nixosConfigurations`, `homeConfigurations`, `formatter`, `devShells`)
 - `lib/` — `mkNixos` and `mkHome` helper functions that build `nixosConfigurations` / `homeConfigurations` entries
 - `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22, and a GNOME desktop (GDM login, NetworkManager, PipeWire audio, CUPS+Avahi printing) — see below
+- `modules/nixos/dev-postgresql.nix` — opt-in `development.postgresql.enable` (default off; on only for `test-vm`): PostgreSQL 18 listening on `127.0.0.1`/`::1`:5432 with trust auth on loopback, and no databases pre-created — make them with `createdb -h localhost -U postgres <name>`
 - `modules/home/` — the shared, cross-platform home-manager profile (shell, editor, CLI tools, dev tools, dotfiles). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
 - `users/tom.nix` — identity/profile file consumed by both `mkNixos` and `mkHome`
 - `hosts/template/` — a copy-source-only NixOS host skeleton; **never** wired into `flake.nix` outputs directly (excluded from discovery by name — see below). Copy it via `scripts/bootstrap-host.sh` (or `nix run .#bootstrap-host`) when provisioning a real machine

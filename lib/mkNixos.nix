@@ -12,6 +12,7 @@ inputs.nixpkgs.lib.nixosSystem {
         builtins.elem (inputs.nixpkgs.lib.getName pkg) unfreeAllowlist;
     }
     ../modules/nixos/common.nix
+    ../modules/nixos/dev-postgresql.nix
     ../hosts/${hostname}/configuration.nix
     inputs.home-manager.nixosModules.home-manager
     {
