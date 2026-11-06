@@ -3,7 +3,7 @@
 #   cp -r hosts/template hosts/<real-hostname>
 # then edit the CHANGEME values below and replace hardware-configuration.nix
 # with the output of `nixos-generate-config`. See README.md for the full flow.
-{ ... }:
+{ pkgs, ... }:
 {
   imports = [ ./hardware-configuration.nix ];
 
@@ -24,6 +24,13 @@
 
   # Fingerprint reader (fprintd). Enroll with `fprintd-enroll`.
   services.fprintd.enable = true;
+
+  # Bitwarden's "Unlock with system authentication" goes through polkit, which
+  # only reads policies from the system profile. Bitwarden itself comes from
+  # home-manager (per-user profile), so install it system-wide as well to expose
+  # its com.bitwarden.Bitwarden.unlock policy.
+  security.polkit.enable = true;
+  environment.systemPackages = [ pkgs.bitwarden-desktop ];
 
   # Set to the NixOS release in use by the installer at install time
   # (e.g. "24.05"). This only affects on-disk state format compatibility —
