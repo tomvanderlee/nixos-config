@@ -127,7 +127,7 @@ The script never changes the profile's `autoconnect` setting, so you can still t
 
 ## Nextcloud client
 
-The Nextcloud desktop sync client (`nextcloud`) is part of the shared home profile on Linux. Sign in on first launch; the login is stored in the GNOME keyring, so no server URL or credentials live in this repository. To start it automatically, enable "Launch on system startup" in the client's settings.
+The Nextcloud desktop sync client (`nextcloud`) is part of the shared home profile on Linux. Sign in on first launch; the login is stored in the GNOME keyring, so no server URL or credentials live in this repository. To start it automatically, enable "Launch on system startup" in the client's settings. The launcher is wrapped in `modules/home/desktop-apps.nix` to expose GTK3's settings schemas; without that, the client aborts when the folder chooser opens while adding a folder connection.
 
 ## Claude Desktop
 
