@@ -13,6 +13,7 @@ inputs.nixpkgs.lib.nixosSystem {
     }
     ../modules/nixos/common.nix
     ../modules/nixos/dev-postgresql.nix
+    ../modules/nixos/vpn-autoconnect.nix
     ../modules/nixos/zfs.nix
     ../hosts/${hostname}/configuration.nix
     inputs.home-manager.nixosModules.home-manager

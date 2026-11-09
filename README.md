@@ -8,6 +8,7 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 - `lib/` — `mkNixos` and `mkHome` helper functions that build `nixosConfigurations` / `homeConfigurations` entries
 - `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22, and a GNOME desktop (GDM login, NetworkManager, PipeWire audio, CUPS+Avahi printing) — see below
 - `modules/nixos/dev-postgresql.nix` — opt-in `development.postgresql.enable` (default off; on only for `test-vm`): PostgreSQL 18 listening on `127.0.0.1`/`::1`:5432 with trust auth on loopback, and no databases pre-created — make them with `createdb -h localhost -U postgres <name>`
+- `modules/nixos/vpn-autoconnect.nix` — opt-in `vpn.autoConnect.enable` (default off; on for `toms-thinkpad`): a NetworkManager dispatcher script that brings an existing WireGuard profile up on untrusted networks and down on trusted ones — see "VPN auto-connect" below
 - `modules/nixos/zfs.nix` — opt-in `storage.zfs.enable` (default off): sets the required `networking.hostId` (`storage.zfs.hostId`), enables ZFS support, autoScrub and trim. `storage.zfs.encryptedHome.dataset = "rpool/home"` additionally prompts for that natively-encrypted dataset's passphrase at boot. Pool/dataset creation and `fileSystems` stay in the host's `hardware-configuration.nix`
 - `modules/home/` — the shared, cross-platform home-manager profile (shell, editor, CLI tools, dev tools, dotfiles). The same modules are consumed whether activated via a NixOS host's home-manager module or standalone `home-manager switch`
 - `users/tom.nix` — identity/profile file consumed by both `mkNixos` and `mkHome`
@@ -96,6 +97,26 @@ flatpak update
 ```
 
 Flatpak apps live outside the Nix store, so they are not declarative and not covered by the unfree allowlist.
+
+## VPN auto-connect
+
+`vpn.autoConnect` (see `modules/nixos/vpn-autoconnect.nix`) manages a WireGuard profile you created yourself in GNOME Settings; keys, endpoint and DNS stay in NetworkManager, not in Nix.
+
+```nix
+vpn.autoConnect = {
+  enable = true;
+  connectionName = "Home";        # default
+  trustedSsids = [ "ErmeLan" ];   # default: none
+};
+```
+
+When a wired or Wi-Fi connection comes up or goes down, the VPN is:
+
+- brought **down** if any wired connection is active (wired is always trusted) or an active Wi-Fi SSID is in `trustedSsids`;
+- brought **up** if only other Wi-Fi networks are active;
+- left alone if no physical connection is active.
+
+The script never changes the profile's `autoconnect` setting, so you can still toggle the VPN in the GNOME network menu (or `nmcli connection up|down Home`). Your choice sticks until the next network up/down event (for example a Wi-Fi reconnect), which re-applies the rules above. Decisions are logged: `journalctl -t vpn-autoconnect`.
 
 ## Follow-ups (not covered by this change)
 

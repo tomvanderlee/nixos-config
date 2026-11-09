@@ -22,6 +22,16 @@
     encryptedHome.dataset = "zpool/home";
   };
 
+  # Loopback-only PostgreSQL for local development.
+  development.postgresql.enable = true;
+
+  # Bring the "Home" WireGuard profile up on untrusted networks. Wired and
+  # these SSIDs are trusted (VPN down); GNOME toggling still works.
+  vpn.autoConnect = {
+    enable = true;
+    trustedSsids = [ "ErmeLan" ];
+  };
+
   # Fingerprint reader (fprintd). Enroll with `fprintd-enroll`.
   services.fprintd.enable = true;
 
