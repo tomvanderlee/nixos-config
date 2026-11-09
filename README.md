@@ -85,6 +85,18 @@ NixOS and most other Linux distros don't ship a `~/.bash_profile` that sources `
 - `nix develop` — a shell with `statix` and `deadnix` for linting.
 - `nix flake check` — validates `homeConfigurations."tom@linux"`, `apps.bootstrap-host`, and the other outputs defined here (there are no real `nixosConfigurations` until a host is scaffolded — see Follow-ups).
 
+## Flatpak
+
+Every NixOS host has Flatpak enabled with the `flathub` remote added automatically (needs network on first boot). Use it for apps nixpkgs doesn't package:
+
+```
+flatpak install flathub <app-id>
+flatpak run <app-id>
+flatpak update
+```
+
+Flatpak apps live outside the Nix store, so they are not declarative and not covered by the unfree allowlist.
+
 ## Follow-ups (not covered by this change)
 
 - Push this repo to a remote — required before `nixos-install` can `git clone` it during a real install.

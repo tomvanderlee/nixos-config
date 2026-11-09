@@ -88,6 +88,24 @@
   # for reliability over the rootless isolation guarantee.
   virtualisation.docker.enable = true;
 
+  # Flatpak for desktop apps that nixpkgs doesn't package. The remote is added
+  # at system level by a one-shot unit; it is not a dependency of anything, so
+  # failing offline at boot is harmless and --if-not-exists makes retries safe.
+  services.flatpak.enable = true;
+  systemd.services.flatpak-repo = {
+    wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    path = [ pkgs.flatpak ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    '';
+  };
+
   # Lets prebuilt, foreign dynamically-linked binaries run on NixOS - needed
   # for uv-managed prebuilt Python interpreters and native wheel extensions,
   # which expect a standard (non-NixOS) dynamic loader path. The libraries
