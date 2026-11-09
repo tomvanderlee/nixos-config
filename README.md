@@ -124,3 +124,13 @@ The script never changes the profile's `autoconnect` setting, so you can still t
 - Add a real NixOS host once hardware has been partitioned (see workflow above).
 - Add nix-darwin once a real Mac host is being configured.
 - Add secrets management (e.g. sops-nix) — none is set up yet.
+
+## Claude Desktop
+
+Claude Desktop (Anthropic's official Linux build, currently beta) isn't in nixpkgs, so `pkgs/claude-desktop.nix` repackages the official `.deb`. It is part of the shared home profile on Linux. It does not update itself: updates arrive only when the pinned version is bumped. Cowork (the QEMU VM feature) is not provisioned.
+
+To bump, copy `Version`, and each architecture's `SHA256` (convert to SRI with `nix hash convert --hash-algo sha256 --to sri <hex>`), from the apt index into `pkgs/claude-desktop.nix`:
+
+```
+curl -s https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages   # also binary-arm64
+```

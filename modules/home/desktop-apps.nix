@@ -12,6 +12,8 @@ let
     pkgs.firefox
     pkgs.bitwarden-desktop
     pkgs.ghostty
+    # Not in nixpkgs: repackaged from Anthropic's official .deb (beta).
+    (pkgs.callPackage ../../pkgs/claude-desktop.nix { })
   ];
   linuxOnlyApps = lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.teams-for-linux;
   # GNOME Tweaks only makes sense where GNOME is actually enabled, which this
