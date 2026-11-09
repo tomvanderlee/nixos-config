@@ -12,6 +12,7 @@ let
     pkgs.firefox
     pkgs.bitwarden-desktop
     pkgs.ghostty
+    pkgs.nextcloud-client
     # Not in nixpkgs: repackaged from Anthropic's official .deb (beta).
     (pkgs.callPackage ../../pkgs/claude-desktop.nix { })
   ];

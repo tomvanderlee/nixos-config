@@ -125,6 +125,10 @@ The script never changes the profile's `autoconnect` setting, so you can still t
 - Add nix-darwin once a real Mac host is being configured.
 - Add secrets management (e.g. sops-nix) — none is set up yet.
 
+## Nextcloud client
+
+The Nextcloud desktop sync client (`nextcloud`) is part of the shared home profile on Linux. Sign in on first launch; the login is stored in the GNOME keyring, so no server URL or credentials live in this repository. To start it automatically, enable "Launch on system startup" in the client's settings.
+
 ## Claude Desktop
 
 Claude Desktop (Anthropic's official Linux build, currently beta) isn't in nixpkgs, so `pkgs/claude-desktop.nix` repackages the official `.deb`. It is part of the shared home profile on Linux. It does not update itself: updates arrive only when the pinned version is bumped. Cowork (the QEMU VM feature) is not provisioned.
