@@ -20,16 +20,16 @@
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
 
   # English language and messages, but European formats: Dutch numbers,
-  # currency, paper and units. LC_TIME uses en_DK rather than nl_NL to keep
+  # currency, paper and units. LC_TIME uses en_GB rather than nl_NL to keep
   # English weekday/month names (glibc has no en_NL); it still gives a
-  # 24-hour clock, Monday-first weeks and ISO dates. LC_COLLATE/LC_CTYPE stay
+  # 24-hour clock, Monday-first weeks and day-first dates. LC_COLLATE/LC_CTYPE stay
   # on the default so sort order and character classes don't change.
   i18n.extraLocaleSettings = {
     LC_NUMERIC = "nl_NL.UTF-8";
     LC_MONETARY = "nl_NL.UTF-8";
     LC_PAPER = "nl_NL.UTF-8";
     LC_MEASUREMENT = "nl_NL.UTF-8";
-    LC_TIME = "en_DK.UTF-8";
+    LC_TIME = "en_GB.UTF-8";
   };
 
   # Keeps the system timezone in sync with actual location with no manual
