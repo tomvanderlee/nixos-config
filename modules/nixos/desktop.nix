@@ -43,6 +43,13 @@
     };
     security.rtkit.enable = true;
 
+    # Dummy AVRCP media player so Bluetooth headsets (AirPods tap gestures)
+    # can send play/pause/skip; the declarative form of the wireplumber
+    # snippet in LibrePods' README. Do not also run mpris-proxy.
+    services.pipewire.wireplumber.extraConfig."51-bluez-avrcp"."monitor.bluez.properties" = {
+      "bluez5.dummy-avrcp-player" = true;
+    };
+
     services.printing.enable = true;
     services.avahi = {
       enable = true;

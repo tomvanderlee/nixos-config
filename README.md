@@ -140,6 +140,10 @@ The script never changes the profile's `autoconnect` setting, so you can still t
 
 The Nextcloud desktop sync client (`nextcloud`) is part of the shared home profile on Linux. Sign in on first launch; the login is stored in the GNOME keyring, so no server URL or credentials live in this repository. To start it automatically, enable "Launch on system startup" in the client's settings. The launcher is wrapped in `modules/home/desktop-apps.nix` to expose GTK3's settings schemas; without that, the client aborts when the folder chooser opens while adding a folder connection.
 
+## LibrePods
+
+LibrePods (from nixpkgs, Linux only, part of the shared home profile) controls AirPods: noise control modes, conversational awareness, battery level and ear detection. Launch `librepods` from the app menu or terminal (it lives in a tray icon, and stock GNOME shows no tray, so the AppIndicator extension is needed to reach it there). `librepods-ctl noise:anc` (also `noise:off`, `noise:transparency`, `noise:adaptive`) controls it from scripts while the app runs. Desktop hosts also enable WirePlumber's dummy AVRCP player so AirPods tap gestures control playback. Hearing-aid mode is not set up: it needs `DeviceID = bluetooth:004C:0000:0000` in the BlueZ config and a re-pair.
+
 ## Claude Desktop
 
 Claude Desktop (Anthropic's official Linux build, currently beta) isn't in nixpkgs, so `pkgs/claude-desktop.nix` repackages the official `.deb`. It is part of the shared home profile on Linux. It does not update itself: updates arrive only when the pinned version is bumped. Cowork (the QEMU VM feature) is not provisioned.

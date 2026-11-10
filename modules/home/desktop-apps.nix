@@ -32,7 +32,12 @@ let
     # Not in nixpkgs: repackaged from Anthropic's official .deb (beta).
     (pkgs.callPackage ../../pkgs/claude-desktop.nix { })
   ];
-  linuxOnlyApps = lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.teams-for-linux;
+  # librepods declares no meta.platforms, so availableOn would not drop it on
+  # macOS; it needs BlueZ and Qt Bluetooth, hence Linux-only.
+  linuxOnlyApps = lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+    pkgs.teams-for-linux
+    pkgs.librepods
+  ];
   # GNOME Tweaks only makes sense where GNOME is actually enabled, which this
   # flake only does at the NixOS level (modules/nixos/common.nix) - not on
   # standalone, non-NixOS activations of this shared profile. osConfig is the
