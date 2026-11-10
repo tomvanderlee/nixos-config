@@ -29,6 +29,14 @@
       { settings."org/gnome/desktop/interface".color-scheme = "prefer-dark"; }
     ];
 
+    # GDM lists every AccountsService user whose SystemAccount is false, and
+    # root is cached that way (shown as "System administrator").
+    # services.displayManager.hiddenUsers is not read by GDM, so mark root as
+    # a system account directly; f+ also corrects a stale SystemAccount=false.
+    systemd.tmpfiles.rules = [
+      "f+ /var/lib/AccountsService/users/root 0600 root root - [User]\\nSystemAccount=true\\n"
+    ];
+
     services.pipewire = {
       enable = true;
       pulse.enable = true;

@@ -40,6 +40,9 @@
 
   users.users.tom = {
     isNormalUser = true;
+    # Display name on the GDM login screen; without it GDM shows the
+    # lowercase login name.
+    description = "Tom";
     extraGroups = [
       "wheel"
       "docker"
