@@ -6,7 +6,8 @@ A single Nix flake for provisioning both NixOS hosts and non-NixOS systems (any 
 
 - `flake.nix` — inputs (`nixpkgs`, `home-manager`) and outputs (`nixosConfigurations`, `homeConfigurations`, `formatter`, `devShells`)
 - `lib/` — `mkNixos` and `mkHome` helper functions that build `nixosConfigurations` / `homeConfigurations` entries
-- `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22, and a GNOME desktop (GDM login, NetworkManager, PipeWire audio, CUPS+Avahi printing) — see below
+- `modules/nixos/common.nix` — shared NixOS-only system settings applied to every NixOS host: flakes enabled, `tom` user (bash as the login shell), locale/timezone defaults, gc policy, sshd (key-only auth) with a firewall allowing port 22, NetworkManager, Docker and nix-ld
+- `modules/nixos/desktop.nix` — `desktop.enable` (default on): the GNOME desktop (GDM login, PipeWire audio, CUPS+Avahi printing, Flatpak) — see "Desktop environment" below
 - `modules/nixos/dev-postgresql.nix` — opt-in `development.postgresql.enable` (default off; on only for `test-vm`): PostgreSQL 18 listening on `127.0.0.1`/`::1`:5432 with trust auth on loopback, and no databases pre-created — make them with `createdb -h localhost -U postgres <name>`
 - `modules/nixos/vpn-autoconnect.nix` — opt-in `vpn.autoConnect.enable` (default off; on for `toms-thinkpad`): a NetworkManager dispatcher script that brings an existing WireGuard profile up on untrusted networks and down on trusted ones — see "VPN auto-connect" below
 - `modules/nixos/zfs.nix` — opt-in `storage.zfs.enable` (default off): sets the required `networking.hostId` (`storage.zfs.hostId`), enables ZFS support, autoScrub and trim. `storage.zfs.encryptedHome.dataset = "rpool/home"` additionally prompts for that natively-encrypted dataset's passphrase at boot. Pool/dataset creation and `fileSystems` stay in the host's `hardware-configuration.nix`
@@ -40,7 +41,17 @@ This flake does not partition disks for you — do that first, with the standard
 
 ## Desktop environment
 
-Every NixOS host built from this flake boots into a GNOME desktop by default (GDM as the login manager), applied unconditionally in `modules/nixos/common.nix` rather than as a per-host opt-in. Necessary companions are enabled alongside it: `networking.networkmanager` (GNOME's own network settings UI), `services.pipewire` + `security.rtkit` (audio, including PulseAudio-compatible clients), and `services.printing` (CUPS) + `services.avahi` (`nssmdns4`, `openFirewall`) for printing and network/AirPrint printer discovery — `openFirewall` is required so mDNS discovery traffic isn't blocked by the port-22-only firewall this repo already enables. This is a system-level toggle only; per-user GNOME customization (dconf, Shell extensions) is out of scope.
+Every NixOS host built from this flake boots into a GNOME desktop by default (GDM as the login manager), defined in `modules/nixos/desktop.nix` and controlled by `desktop.enable` (default `true`, so no per-host opt-in is needed). Companions enabled alongside it: `services.pipewire` + `security.rtkit` (audio, including PulseAudio-compatible clients), `services.printing` (CUPS) + `services.avahi` (`nssmdns4`, `openFirewall`) for printing and network/AirPrint printer discovery — `openFirewall` is required so mDNS discovery traffic isn't blocked by the port-22-only firewall this repo already enables — and Flatpak (see below). `networking.networkmanager` stays on for every host. This is a system-level toggle only; per-user GNOME customization (dconf, Shell extensions) is out of scope.
+
+### Headless hosts
+
+For a host without a display (a server, or a VM with no graphics), set `desktop.enable = false;` in `hosts/<name>/configuration.nix`. That removes the X server, GDM, GNOME, PipeWire, CUPS/Avahi and Flatpak; sshd, NetworkManager, Docker and nix-ld stay. The shared home profile follows it (`home.desktop.enable` defaults to the host's `desktop.enable`) and installs no GUI applications. A standalone home-manager machine can opt out by setting `home.desktop.enable = false;`.
+
+`bootstrap-host` can do this when scaffolding:
+
+```
+nix run .#bootstrap-host -- <real-hostname> --root /mnt --state-version <ver> --headless
+```
 
 ## Installing on a non-NixOS system (any Linux, or macOS once supported)
 
@@ -88,7 +99,7 @@ NixOS and most other Linux distros don't ship a `~/.bash_profile` that sources `
 
 ## Flatpak
 
-Every NixOS host has Flatpak enabled with the `flathub` remote added automatically (needs network on first boot). Use it for apps nixpkgs doesn't package:
+Every desktop-enabled NixOS host (see `desktop.enable` above; headless hosts have no Flatpak) has Flatpak enabled with the `flathub` remote added automatically (needs network on first boot). Use it for apps nixpkgs doesn't package:
 
 ```
 flatpak install flathub <app-id>

@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   osConfig ? null,
@@ -44,5 +45,15 @@ let
   candidateApps = crossPlatformApps ++ linuxOnlyApps ++ gnomeOnlyApps;
 in
 {
-  home.packages = builtins.filter (lib.meta.availableOn pkgs.stdenv.hostPlatform) candidateApps;
+  options.home.desktop.enable = lib.mkOption {
+    type = lib.types.bool;
+    # Follows the NixOS host's desktop.enable when activated through one;
+    # standalone activations (no osConfig) default to having a desktop.
+    default = osConfig.desktop.enable or true;
+    description = "Whether to install desktop GUI applications.";
+  };
+
+  config.home.packages = lib.optionals config.home.desktop.enable (
+    builtins.filter (lib.meta.availableOn pkgs.stdenv.hostPlatform) candidateApps
+  );
 }

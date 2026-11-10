@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: bootstrap-host <hostname> --root <path> --state-version <version> [--system <system>] [--force]
+Usage: bootstrap-host <hostname> --root <path> --state-version <version> [--system <system>] [--headless] [--force]
 
 Scaffolds hosts/<hostname>/ from hosts/template, ready to be picked up
 automatically as nixosConfigurations.<hostname> — no flake.nix edit needed.
@@ -20,6 +20,9 @@ Must be run from the root of the nix-config checkout.
   --state-version <ver>  Required, e.g. 24.05. Never change this after the
                           host's first install.
   --system <system>      Optional. Defaults to x86_64-linux.
+  --headless             Optional. Sets desktop.enable = false for a host
+                          without a display (no GNOME, GDM, audio, printing,
+                          Flatpak or GUI apps).
   --force                Overwrite an existing hosts/<hostname> directory.
 EOF
 }
@@ -29,6 +32,7 @@ root=""
 state_version=""
 system="x86_64-linux"
 force=0
+headless=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -43,6 +47,10 @@ while [ $# -gt 0 ]; do
   --system)
     system="$2"
     shift 2
+    ;;
+  --headless)
+    headless=1
+    shift
     ;;
   --force)
     force=1
@@ -112,6 +120,15 @@ sed -i.bak \
   -e "s/system.stateVersion = \"CHANGEME\";/system.stateVersion = \"$state_version\";/" \
   "$host_dir/configuration.nix"
 rm -f "$host_dir/configuration.nix.bak"
+
+if [ "$headless" -eq 1 ]; then
+  sed -i.bak -e 's/^  # desktop.enable = false;$/  desktop.enable = false;/' "$host_dir/configuration.nix"
+  rm -f "$host_dir/configuration.nix.bak"
+  if ! grep -q '^  desktop.enable = false;$' "$host_dir/configuration.nix"; then
+    echo "Error: could not enable headless mode: placeholder missing from hosts/template/configuration.nix." >&2
+    exit 1
+  fi
+fi
 
 printf '%s' "$system" >"$host_dir/system"
 

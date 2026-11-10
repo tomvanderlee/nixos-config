@@ -6,7 +6,7 @@ Every NixOS host built from this flake unconditionally enables GNOME, GDM, audio
 
 ## What Changes
 
-- Add a NixOS option `desktop.enable` (default `true`, so existing hosts are unchanged) in a new `modules/nixos/desktop.nix`. The GNOME/GDM/X server, dconf dark-mode default, PipeWire/rtkit, and CUPS/Avahi settings move out of `modules/nixos/common.nix` into this module, gated on the option.
+- Add a NixOS option `desktop.enable` (default `true`, so existing hosts are unchanged) in a new `modules/nixos/desktop.nix`. The GNOME/GDM/X server, dconf dark-mode default, PipeWire/rtkit, and CUPS/Avahi settings, and Flatpak with its Flathub unit, move out of `modules/nixos/common.nix` into this module, gated on the option.
 - Add a home-manager option `home.desktop.enable` that defaults to the NixOS `desktop.enable` value when running under a NixOS host (via `osConfig`) and to `true` otherwise. When false, `modules/home/desktop-apps.nix` installs no GUI applications.
 - Add a `--headless` flag to `scripts/bootstrap-host.sh` that writes `desktop.enable = false;` into the new host's `configuration.nix` (from a commented placeholder in `hosts/template/configuration.nix`).
 - Update `README.md` for the new option and flag.
@@ -19,6 +19,7 @@ Every NixOS host built from this flake unconditionally enables GNOME, GDM, audio
 
 ### Modified Capabilities
 - `gnome-desktop`: the desktop stack becomes conditional on `desktop.enable` (default on); adds the option requirement. Dark mode, audio and printing requirements apply only when the desktop is enabled.
+- `flatpak`: Flatpak and the Flathub remote are provisioned only on desktop-enabled hosts (Flatpak requires XDG desktop portals, which a headless host does not have; a headless build otherwise fails an assertion).
 - `desktop-applications`: GUI apps are provisioned only when the desktop is enabled.
 - `nix-flake-bootstrap`: host creation script gains `--headless`.
 

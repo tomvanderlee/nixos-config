@@ -9,6 +9,11 @@
 
   networking.hostName = "CHANGEME";
 
+  # Uncomment for hosts without a display (servers, VMs): disables GNOME, GDM,
+  # audio, printing and Flatpak, and the shared home profile skips GUI apps.
+  # (bootstrap-host --headless does this for you.)
+  # desktop.enable = false;
+
   # UEFI (most modern machines):
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;

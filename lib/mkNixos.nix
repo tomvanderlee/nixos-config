@@ -12,6 +12,7 @@ inputs.nixpkgs.lib.nixosSystem {
         builtins.elem (inputs.nixpkgs.lib.getName pkg) unfreeAllowlist;
     }
     ../modules/nixos/common.nix
+    ../modules/nixos/desktop.nix
     ../modules/nixos/dev-postgresql.nix
     ../modules/nixos/vpn-autoconnect.nix
     ../modules/nixos/zfs.nix
