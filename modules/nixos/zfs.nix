@@ -37,6 +37,11 @@ in
   config = lib.mkIf cfg.enable {
     networking.hostId = cfg.hostId;
     boot.supportedFilesystems = [ "zfs" ];
+    # Import the root pool without `zpool import -f` (the 26.11 default).
+    # hostId above is stable, so a forced import is not needed and would
+    # bypass ZFS's guard against a pool still in use by another system. A host
+    # with a cloned or foreign-imported pool can set this to true.
+    boot.zfs.forceImportRoot = lib.mkDefault false;
     services.zfs.autoScrub.enable = true;
     services.zfs.trim.enable = true;
 
