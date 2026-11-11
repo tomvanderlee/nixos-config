@@ -28,6 +28,10 @@
       kubectl
       kubernetes-helm
       awscli2
+      ssm-session-manager-plugin
+      google-cloud-sdk
+      google-cloud-sql-proxy
+      (azure-cli.withExtensions [ azure-cli.extensions.bastion ])
       bitwarden-cli
       uv
       openssl
