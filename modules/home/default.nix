@@ -4,6 +4,7 @@
     ./bash-profile.nix
     ./editor.nix
     ./cli-tools.nix
+    ./network-tools.nix
     ./dotfiles.nix
     ./dev-tools.nix
     ./languages.nix

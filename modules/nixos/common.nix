@@ -5,6 +5,20 @@
     "flakes"
   ];
 
+  # System-wide Linux diagnostics, available to root and without home-manager.
+  # Raw-socket tools are run with sudo; no wrappers are configured.
+  environment.systemPackages = with pkgs; [
+    tcpdump
+    traceroute
+    lsof
+    strace
+    psmisc
+    pciutils
+    usbutils
+    iotop
+    ethtool
+  ];
+
   nix.gc = {
     automatic = true;
     dates = "weekly";

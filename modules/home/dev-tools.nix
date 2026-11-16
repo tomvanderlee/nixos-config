@@ -35,6 +35,7 @@
       bitwarden-cli
       uv
       openssl
+      openspec
       wireguard-tools
     ])
     ++ lib.optional (lib.meta.availableOn pkgs.stdenv.hostPlatform pkgs.claude-code) pkgs.claude-code;
