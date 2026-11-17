@@ -21,11 +21,28 @@ let
     '';
     inherit (pkgs.nextcloud-client) meta;
   };
+  # Firefox 159/160 on native Wayland (GNOME, Intel Arrow Lake, Mesa 26.3.0,
+  # mixed-scale multi-monitor) crashed and stalled repainting while audio and
+  # input kept working. XWayland avoids both. TEMPORARY: to revert, drop this
+  # binding and use pkgs.firefox again, after checking that
+  # `MOZ_ENABLE_WAYLAND=1 firefox` shows Window Protocol "wayland" in
+  # about:support and survives YouTube Shorts / GeoFS. Only the outer
+  # bin/firefox is re-wrapped so nixpkgs' own wrapper (native messaging hosts,
+  # MOZ_SYSTEM_DIR) is untouched.
+  firefox = pkgs.symlinkJoin {
+    name = "firefox-${pkgs.firefox.version}";
+    paths = [ pkgs.firefox ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/firefox --set MOZ_ENABLE_WAYLAND 0
+    '';
+    inherit (pkgs.firefox) meta;
+  };
   crossPlatformApps = [
     pkgs.slack
     pkgs.discord
     pkgs.spotify
-    pkgs.firefox
+    firefox
     pkgs.bitwarden-desktop
     pkgs.ghostty
     nextcloud-client
