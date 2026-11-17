@@ -44,15 +44,15 @@
   xdg-utils,
 }:
 let
-  version = "4.23118.0";
+  version = "5.11492.5";
   sources = {
     x86_64-linux = {
       arch = "amd64";
-      hash = "sha256-GtmW6MqrBcmzdGRgUcQMtrudhPNxdW8VuNNyiJdRWpc=";
+      hash = "sha256-uWIIsgfkULdA99vjBPYHf+2A5/PTfd1UWZHE6CAVZM8=";
     };
     aarch64-linux = {
       arch = "arm64";
-      hash = "sha256-tMBOCDOLMh9cAlQ6tr6BnLufOO8FGj59j/3FtNUkjqQ=";
+      hash = "sha256-/mzYpw+WuW605rZHMAz67mqv9M4TOg+74Rws23dfWmo=";
     };
   };
   src' =
