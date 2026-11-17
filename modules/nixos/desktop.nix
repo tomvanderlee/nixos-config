@@ -26,7 +26,14 @@
     # is searched before this default database.
     programs.dconf.enable = true;
     programs.dconf.profiles.user.databases = [
-      { settings."org/gnome/desktop/interface".color-scheme = "prefer-dark"; }
+      {
+        settings = {
+          "org/gnome/desktop/interface".color-scheme = "prefer-dark";
+          # Default only: a user-level enabled-extensions list (e.g. written by
+          # Extension Manager) takes precedence and must include GSConnect.
+          "org/gnome/shell".enabled-extensions = [ "gsconnect@andyholmes.github.io" ];
+        };
+      }
     ];
 
     # GDM lists every AccountsService user whose SystemAccount is false, and
@@ -48,6 +55,16 @@
     # snippet in LibrePods' README. Do not also run mpris-proxy.
     services.pipewire.wireplumber.extraConfig."51-bluez-avrcp"."monitor.bluez.properties" = {
       "bluez5.dummy-avrcp-player" = true;
+    };
+
+    # KDE Connect via GSConnect, the GNOME Shell implementation of the same
+    # protocol (the Qt daemon has no tray on GNOME). Also opens TCP/UDP
+    # 1714-1764 and enables uinput. Must be the nixpkgs package, not one from
+    # extensions.gnome.org: its daemon needs gjs and GTK3 typelibs that only
+    # the Nix package wires up.
+    programs.kdeconnect = {
+      enable = true;
+      package = pkgs.gnomeExtensions.gsconnect;
     };
 
     services.printing.enable = true;

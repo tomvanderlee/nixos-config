@@ -144,6 +144,12 @@ The Nextcloud desktop sync client (`nextcloud`) is part of the shared home profi
 
 LibrePods (from nixpkgs, Linux only, part of the shared home profile) controls AirPods: noise control modes, conversational awareness, battery level and ear detection. Launch `librepods` from the app menu or terminal (it lives in a tray icon, and stock GNOME shows no tray, so the AppIndicator extension is needed to reach it there). `librepods-ctl noise:anc` (also `noise:off`, `noise:transparency`, `noise:adaptive`) controls it from scripts while the app runs. Desktop hosts also enable WirePlumber's dummy AVRCP player so AirPods tap gestures control playback. Hearing-aid mode is not set up: it needs `DeviceID = bluetooth:004C:0000:0000` in the BlueZ config and a re-pair.
 
+## Phone integration (KDE Connect)
+
+Desktop hosts install GSConnect (the GNOME Shell implementation of KDE Connect, from nixpkgs), open its ports (TCP/UDP 1714-1764) and enable `uinput`. Install the KDE Connect app on the phone, open GSConnect from the top bar, pair on both devices, and enable clipboard sharing. Pairing data stays in `~/.config/gsconnect`, not in this repository.
+
+The extension is enabled by default through a dconf default, which a user-level `enabled-extensions` list overrides: if it is not active after logging in, enable GSConnect once in Extension Manager. Do not install GSConnect from extensions.gnome.org: that copy (in `~/.local/share/gnome-shell/extensions`) shadows the packaged one, and its daemon cannot start on NixOS because `gjs` and the GTK3 typelibs are not on its path ("The name is not activatable"). Remove it with `rm -r ~/.local/share/gnome-shell/extensions/gsconnect@andyholmes.github.io` if present.
+
 ## Claude Desktop
 
 Claude Desktop (Anthropic's official Linux build, currently beta) isn't in nixpkgs, so `pkgs/claude-desktop.nix` repackages the official `.deb`. It is part of the shared home profile on Linux. It does not update itself: updates arrive only when the pinned version is bumped. Cowork (the QEMU VM feature) is not provisioned.
