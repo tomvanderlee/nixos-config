@@ -1,7 +1,7 @@
 # fingerprint-authentication Specification
 
 ## Purpose
-TBD - created by archiving change add-thinkpad-fingerprint. Update Purpose after archive.
+Provides fingerprint authentication on hosts that have a reader (currently `toms-thinkpad`), enabled per host rather than in shared modules, including fingerprint unlock for the Bitwarden desktop client through polkit.
 
 ## Requirements
 
