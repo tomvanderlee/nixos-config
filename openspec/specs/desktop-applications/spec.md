@@ -96,6 +96,21 @@ The provisioned Nextcloud desktop client SHALL be able to open its local-folder 
 - **WHEN** the desktop session's data directories do not include GTK3's settings schemas
 - **THEN** the client still opens the folder chooser without aborting
 
+### Requirement: RawTherapee is provisioned for viewing camera RAW photos
+The shared home-manager profile SHALL include RawTherapee as a GUI application wherever the desktop is enabled and its package is supported, so camera RAW photos, including Apple ProRAW DNG files, can be opened without a locally compiled package.
+
+#### Scenario: RawTherapee available after activation
+- **WHEN** the shared home profile is activated with the desktop enabled on a supported platform
+- **THEN** RawTherapee is available without any additional installation step
+
+#### Scenario: Apple ProRAW file opens
+- **WHEN** the user opens an Apple ProRAW DNG photo (for example from an iPhone 16 Pro Max), whether named `.dng` or `.raw`, in RawTherapee
+- **THEN** the image is displayed
+
+#### Scenario: Skipped when the desktop is disabled
+- **WHEN** a host sets `desktop.enable = false`
+- **THEN** RawTherapee is not installed
+
 ### Requirement: Desktop applications are skipped when the desktop is disabled
 The shared home profile SHALL provision no desktop GUI applications when the desktop is disabled. The setting SHALL follow the host's `desktop.enable` when activated through a NixOS host, SHALL default to enabled on standalone activations, and SHALL be overridable on standalone activations through `home.desktop.enable`.
 

@@ -46,6 +46,9 @@ let
     pkgs.bitwarden-desktop
     pkgs.ghostty
     nextcloud-client
+    # Camera RAW viewer/editor. Chosen over darktable and the GNOME image viewer's
+    # glycin loader because it decodes Apple ProRAW DNGs; it is binary-cached.
+    pkgs.rawtherapee
     # Not in nixpkgs: repackaged from Anthropic's official .deb (beta).
     (pkgs.callPackage ../../pkgs/claude-desktop.nix { })
   ];
