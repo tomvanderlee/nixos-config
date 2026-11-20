@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   programs.neovim = {
     enable = true;
@@ -19,11 +19,17 @@
   # Neovim plugins declared by the dotfiles-owned config above.
   # nodejs/python3/unzip: required on PATH by mason.nvim's installers
   # (npm-based LSP servers, debugpy, terraform-ls).
-  home.packages = with pkgs; [
-    tree-sitter
-    stdenv.cc
-    nodejs
-    python3
-    unzip
-  ];
+  # dotnet-sdk_10: Mason's dotnet-launched servers (the Bicep language server,
+  # a net10.0 assembly run via `dotnet`). Filtered by availableOn because
+  # nixpkgs lacks it on x86_64-darwin.
+  home.packages =
+    with pkgs;
+    [
+      tree-sitter
+      stdenv.cc
+      nodejs
+      python3
+      unzip
+    ]
+    ++ builtins.filter (lib.meta.availableOn pkgs.stdenv.hostPlatform) [ dotnet-sdk_10 ];
 }
