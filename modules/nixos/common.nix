@@ -111,5 +111,8 @@
     zlib
     libuuid
     libxcrypt-legacy # libcrypt.so.1
+    # libicuuc.so.NN, loaded at startup by prebuilt self-contained .NET
+    # executables (e.g. the Azure-installed Bicep CLI) for globalization.
+    icu
   ];
 }
